@@ -1,0 +1,42 @@
+@startuml C4_Container_CinemaAbyss_ToBe
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Container Diagram - Кинобездна (To-Be)
+
+Person(user, "Пользователь", "Смотрит фильмы, оценивает, управляет подпиской")
+
+System_Ext(payment_system, "Платёжная система", "Обработка платежей")
+System_Ext(recommendation_system, "Рекомендательная система", "Персональные подборки фильмов")
+System_Ext(online_cinemas, "Онлайн-кинотеатры", "Источники видео-контента")
+System_Ext(s3_storage, "S3 Storage", "Хранение видео-файлов")
+
+
+System_Boundary(cinemaabyss, "Кинобездна") {
+    Container(api_gateway, "API Gateway / Proxy", "Go", "Единая точка входа. Маршрутизация запросов")
+    Container(movies_service, "Movies Service", "Go", "Микросервис метаданных о фильмах: жанры, актёры, описания, оценки")
+    Container(monolith, "Monolith (Legacy)", "Go", "Оставшаяся часть монолита: пользователи, подписки, платежи, избранное")
+    Container(events_service, "Events Service", "Go", "Обработка событий: просмотры, действия пользователей")
+    ContainerQueue(kafka, "Apache Kafka", "Kafka", "Асинхронная обработка событий между сервисами")
+    ContainerDb(postgres_movies, "Movies DB", "PostgreSQL", "База метаданных о фильмах")
+    ContainerDb(postgres_main, "Main DB", "PostgreSQL", "Основная БД: пользователи, подписки, платежи")
+}
+
+Rel(user, api_gateway, "Использует", "HTTPS/REST")
+
+Rel(api_gateway, movies_service, "Маршрутизирует /api/movies", "HTTP")
+Rel(api_gateway, monolith, "Маршрутизирует остальные запросы", "HTTP")
+Rel(api_gateway, events_service, "Маршрутизирует /api/events", "HTTP")
+
+Rel(movies_service, kafka, "Публикует события", "Async")
+Rel(monolith, kafka, "Публикует события", "Async")
+Rel(events_service, kafka, "Читает/пишет события", "Async")
+
+Rel(movies_service, postgres_movies, "Читает/пишет", "SQL")
+Rel(monolith, postgres_main, "Читает/пишет", "SQL")
+
+Rel(monolith, payment_system, "Обрабатывает платежи", "HTTPS")
+Rel(monolith, recommendation_system, "Получает рекомендации", "RabbitMQ")
+Rel(monolith, online_cinemas, "Получает контент", "HTTPS")
+Rel(monolith, s3_storage, "Стримит видео", "HTTPS")
+
+@enduml
