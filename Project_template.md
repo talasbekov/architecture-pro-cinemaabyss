@@ -110,6 +110,8 @@ jobs:
 Как только сборка отработает и в github registry появятся ваши образы, можно переходить к блоку настройки Kubernetes
 Успешным результатом данного шага является "зеленая" сборка и "зеленые" тесты
 
+![Тесты: npm run test:kubernetes](screenshots/newman_tests.png)
+
 
 ### Proxy в Kubernetes
 
@@ -271,9 +273,17 @@ cat .docker/config.json | base64
   Часть тестов с health-чек упадет, но создание событий отработает.
   Откройте логи event-service и сделайте скриншот обработки событий
 
+  ![Services](screenshots/k8s_services.png)
+  ![Pods](screenshots/k8s_pods.png)
+  ![Ingress](screenshots/k8s_ingress.png)
+  
+
 #### Шаг 3
 Добавьте сюда скриншота вывода при вызове https://cinemaabyss.example.com/api/movies и  скриншот вывода event-service после вызова тестов.
 
+![Movies API](screenshots/api_movies.png)
+![Newman](screenshots/newman_tests.png)
+![Events Logs](screenshots/events_logs.png)
 
 ## Задание 4
 Для простоты дальнейшего обновления и развертывания вам как архитектуру необходимо так же реализовать helm-чарты для прокси-сервиса и проверить работу 
@@ -349,6 +359,7 @@ minikube tunnel
 https://cinemaabyss.example.com/api/movies
 и приложите скриншот развертывания helm и вывода https://cinemaabyss.example.com/api/movies
 
+![Helm](screenshots/helm.png)
 
 # Задание 5
 Компания планирует активно развиваться и для повышения надежности, безопасности, реализации сетевых паттернов типа Circuit Breaker и канареечного деплоя вам как архитектору необходимо развернуть istio и настроить circuit breaker для monolith и movies сервисов.
@@ -414,6 +425,8 @@ You can see 21 for the upstream_rq_pending_overflow value which means 21 calls s
 ```
 
 Приложите скриншот работы circuit breaker'а
+![circuit breaker'а](screenshots/Fortio1.png)
+![circuit breaker'а](screenshots/Fortio2.png)
 
 Удаляем все
 ```bash
